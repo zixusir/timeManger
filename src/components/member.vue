@@ -29,7 +29,9 @@
             @click="changeTime">
             修改时间
           </mt-button>
-          <mt-button type="danger">删除物品</mt-button>
+          <mt-button
+            type="danger"
+            @click="handleDel(index)">删除物品</mt-button>
           <div style="height: 5px;"></div>
         </div>
       </li>
@@ -72,23 +74,7 @@ export default {
     return {
       loading: true,
       popupVisible: false,
-      list: [
-        {
-          id: 1,
-          title: 'box',
-          data: '2018/10/10'
-        },
-        {
-          id: 2,
-          title: 'box',
-          data: '2018/10/10'
-        },
-        {
-          id: 3,
-          title: 'box',
-          data: '2018/10/10'
-        }
-      ],
+      list: [],
       listShow: [],
       newItem: '',
       datetime: '1199116800000'
@@ -130,6 +116,8 @@ export default {
     },
     addItem: function () {
       this.popupVisible = true
+      this.newItem = ''
+      this.datetime = '1199116800000'
     },
     handleClick: function () {
       let id = this.list.length
@@ -164,8 +152,12 @@ export default {
       Vue.set(this.listShow, index, !this.listShow[index])
     },
     changeTime: function (index) {
-      let id = index
-      console.log(id)
+      this.$refs.picker.open()
+    },
+    handleDel: function (index) {
+      this.list.splice(index, 1)
+      // 更新localStorage
+      localStorage.setItem('lists', JSON.stringify(this.list))
     }
   }
 }
