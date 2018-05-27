@@ -25,13 +25,16 @@
           <p class="right">{{ see(item.data) }}</p>
         </div>
         <div v-show="listShow[index]">
-          <mt-button type="primary"
-            @click="changeTime">
+          <mt-button
+            type="primary"
+            @click="changeTime2(index)">
             修改时间
           </mt-button>
           <mt-button
             type="danger"
-            @click="handleDel(index)">删除物品</mt-button>
+            @click="handleDel(index)">
+            删除物品
+          </mt-button>
           <div style="height: 5px;"></div>
         </div>
       </li>
@@ -77,7 +80,9 @@ export default {
       list: [],
       listShow: [],
       newItem: '',
-      datetime: '1199116800000'
+      datetime: '1199116800000',
+      timeChange: false,
+      timeIndex: 0
     }
   },
   computed: {
@@ -120,7 +125,7 @@ export default {
       this.datetime = '1199116800000'
     },
     handleClick: function () {
-      let id = this.list.length
+      let id = this.list[this.list.length - 1].id
       let item = {
         id: id + 1,
         title: this.newItem,
@@ -141,7 +146,22 @@ export default {
       this.$refs.picker.open()
     },
     handleConfirm: function (date) {
-      this.datetime = date.valueOf()
+      if (this.timeChange) {
+        console.log('修改时间')
+        this.datetime = date.valueOf()
+        let newItem = {
+          id: this.list[this.timeIndex].id,
+          title: this.list[this.timeIndex].title,
+          data: this.datetime,
+          show: this.list[this.timeIndex].show
+        }
+        Vue.set(this.list, this.timeIndex, newItem)
+        localStorage.setItem('lists', JSON.stringify(this.list))
+      } else {
+        this.datetime = date.valueOf()
+      }
+      this.timeChange = false
+      this.$refs.picker.close()
     },
     see: function (time) {
       let date = new Date()
@@ -151,11 +171,14 @@ export default {
     toggleShow: function (index) {
       Vue.set(this.listShow, index, !this.listShow[index])
     },
-    changeTime: function (index) {
+    changeTime2: function (index) {
       this.$refs.picker.open()
+      this.timeChange = true
+      this.timeIndex = index
     },
     handleDel: function (index) {
       this.list.splice(index, 1)
+      // 删除数组中元素的方法
       // 更新localStorage
       localStorage.setItem('lists', JSON.stringify(this.list))
     }
